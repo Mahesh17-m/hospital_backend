@@ -9,29 +9,23 @@ const patientRoutes = require('./routes/patientRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 
 dotenv.config();
-
 const app = express();
 
-// ✅ CORS setup
+// ✅ CORS setup (only localhost frontend allowed)
 app.use(cors({
-  origin: [
-    'http://localhost:5173',            // frontend running locally (Vite)
-    'https://hospitalapplication.netlify.app' // deployed frontend
-  ],
+  origin: 'http://localhost:5173', // local frontend (Vite)
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// ✅ Connect to MongoDB (LOCAL)
+// ✅ MongoDB connection
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log('✅ Connected to Local MongoDB'))
-.catch(err => {
-  console.error('❌ MongoDB connection error:', err.message);
-});
+.then(() => console.log('✅ Connected to MongoDB'))
+.catch(err => console.error('❌ MongoDB connection error:', err.message));
 
 // ✅ Middlewares
 app.use(bodyParser.json());
@@ -66,7 +60,12 @@ app.use((req, res) => {
 });
 
 // ✅ Start server (local only)
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running locally on http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running locally on http://localhost:${PORT}`);
+  });
+}
+
+// ✅ For Vercel (export app if deployed)
+module.exports = app;
