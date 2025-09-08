@@ -13,11 +13,15 @@ const app = express();
 
 // ✅ CORS setup (only localhost frontend allowed)
 app.use(cors({
-  origin: 'http://localhost:5173', // local frontend (Vite)
+  origin: [
+    'http://localhost:5173',
+    'https://hospitalsystem1.netlify.app' // ✅ new frontend
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 
 // ✅ MongoDB connection
 mongoose.connect(process.env.MONGODB_URI, {
